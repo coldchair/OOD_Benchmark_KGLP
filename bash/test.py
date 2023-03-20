@@ -1,8 +1,8 @@
 import os
 from config import MODELS_ROOT_PATH
 from config import IMAGE_ROOT_PATH
-from utils.dir import get_models_list
-from utils.read_ranks import read_ranks
+from my_utils.dir import get_models_list
+from my_utils.read_ranks import read_ranks
 from datasets import Dataset
 from degree.s_plus_o_100_buckets import draw
 

@@ -1,6 +1,6 @@
 import os
-from utils.dir import make_dir
-from utils.evalution import mrr_score
+from my_utils.dir import make_dir
+from my_utils.evalution import mrr_score
 from degree.get_degree import get_degree
 from matplotlib import pyplot as plt
 
@@ -10,7 +10,6 @@ def draw(dataset, ranks, img_dir):
     arr = []
     entity_in_degrees, entity_out_degrees, entity_degrees = get_degree(dataset)
     n = 0
-    print(len(ranks))
     for (head, relation, tail) in dataset.test_triples:
         arr.append([
             entity_out_degrees[head] + entity_in_degrees[tail],
