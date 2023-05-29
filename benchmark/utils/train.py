@@ -63,7 +63,7 @@ def train(
                 _neg[:, 0], _neg[:, 1], _neg[:, 2], mode=None
             ).view(neg.shape[:2]).contiguous()
 
-            loss = loss_func(pos_ret, neg_ret)
+            loss = loss_func(pos_ret, neg_ret) + model.collect_regularization_term()
             loss.backward()
             print(f"Epoch: {epoch} Step: {step}/{total_step} Loss: {loss.item()}")
             optimizer.step()
