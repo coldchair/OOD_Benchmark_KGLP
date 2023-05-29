@@ -26,7 +26,7 @@ def load_data(dir_path: str):
     train_file_path = os.path.join(dir_path, "train.tsv")
     train_dataset = KGDataset.load_csv(train_file_path)
 
-    valid_file_path = os.path.join(dir_path, "train.tsv")
+    valid_file_path = os.path.join(dir_path, "valid.tsv")
     if os.path.exists(valid_file_path):
         valid_dataset = KGDataset.load_csv(
             valid_file_path,
@@ -47,6 +47,8 @@ def load_data(dir_path: str):
     }
 
 def main(config):
+    config_save_path = os.path.join(config.output_dir_path, "config.yaml")
+    OmegaConf.save(config, config_save_path)
     set_random_seed(config.seed)
     datasets = load_data(config.dataset_dir_path)
     model_name = config.model.pop("name")
