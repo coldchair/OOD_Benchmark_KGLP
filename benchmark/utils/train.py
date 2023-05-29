@@ -53,7 +53,6 @@ def train(
             if step < start_step:
                 continue
 
-            optimizer.zero_grad()
             pos = batch["positives"].to(device)
             neg = batch["negatives"].to(device)
 
@@ -68,6 +67,8 @@ def train(
             loss.backward()
             print(f"Epoch: {epoch} Step: {step}/{total_step} Loss: {loss.item()}")
             optimizer.step()
+            optimizer.zero_grad()
+            model.post_parameter_update()
 
             tb_writer.add_scalar("loss", loss.item(), step)
 
