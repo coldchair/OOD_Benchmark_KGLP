@@ -85,10 +85,7 @@ def train(
                     model, 
                     train_dataset,
                     valid_dataset,
-                    batch_size = config.eval.get(
-                        "batch_size", 
-                        batch_size
-                    ),
+                    batch_size = config.eval.batch_size,
                     filter_datasets = (train_dataset, valid_dataset)
                 )
                 mrr = eval_ret["mrr"]
