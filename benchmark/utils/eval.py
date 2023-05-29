@@ -4,6 +4,7 @@ from enum import Enum
 from pykeen.models import ERModel
 from typing import Tuple, Optional
 from collections import defaultdict
+import tqdm
 
 from dataset import KGDataset
 
@@ -38,7 +39,7 @@ def eval(
                 rt = (triple[1], triple[2])
                 rt_to_fileters[rt].append(triple[0])
     
-    for rt, h_list in rt_to_triples.items():
+    for rt, h_list in tqdm.tqdm(rt_to_triples.items(), desc="Eval Head Prediction"):
         h_scores: torch.FloatTensor = model.score_h(
             torch.tensor([[rt[0], rt[1]]], dtype=torch.int32, device=device),
             slice_size=batch_size
@@ -75,7 +76,7 @@ def eval(
                 hr = (triple[0], triple[1])
                 hr_to_fileters[hr].append(triple[2])
     
-    for hr, t_list in hr_to_triples.items():
+    for hr, t_list in tqdm.tqdm(hr_to_triples.items(), desc="Eval Tail Prediction"):
         t_scores: torch.FloatTensor = model.score_t(
             torch.tensor([[hr[0], hr[1]]], dtype=torch.int32),
             slice_size=batch_size
