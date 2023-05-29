@@ -2,6 +2,7 @@ import os
 from omegaconf import OmegaConf
 import numpy as np
 import torch
+from pykeen.utils import set_random_seed
 from pykeen.models import (
     ConvE,
     DistMult,
@@ -46,10 +47,12 @@ def load_data(dir_path: str):
     }
 
 def main(config):
+    set_random_seed(config.seed)
     datasets = load_data(config.dataset_dir_path)
     model_name = config.model.pop("name")
     model = MODEL[model_name](
-        triples_factory = datasets["train"].to_triples_factory(),
+        triples_factory=datasets["train"].to_triples_factory(),
+        random_seed=config.seed,
         **config.model
     )
     if config.model_ckpt_path and os.path.isfile(config.model_ckpt_path):
