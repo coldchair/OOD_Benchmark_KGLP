@@ -1,0 +1,5 @@
+torch==1.12.1
+torch-max-mem==0.0.4
+pykeen==1.10.1
+omegaconf==2.3.0
+tensorboard==2.13.0
