@@ -4,6 +4,7 @@ from torch import FloatTensor
 class Loss(object):
     def __init__(self, *args, **kwargs):
         super().__init__()
+        self._reduction_method = kwargs.get("reduction_method", "sum")
     
     def __call__(
         self,
@@ -11,6 +12,13 @@ class Loss(object):
         neg_ret: FloatTensor,
     ):
         return self.forward(pos_ret, neg_ret)
+
+    def _reduce_sapmle_loss(self, loss):
+        assert loss.ndim > 1
+        if self._reduction_method == "mean":
+            return torch.mean(loss, dim=-1)
+        else:
+            return torch.sum(loss, dim=-1)
 
     def forward(
         self,
@@ -27,7 +35,7 @@ class MulticlassNLL(Loss):
     ):
         pos_exp = torch.exp(pos_ret)
         neg_exp = torch.exp(neg_ret)
-        softmax_score = pos_exp / (torch.mean(neg_exp, dim=-1) + pos_exp)
+        softmax_score = pos_exp / (self._reduce_sapmle_loss(neg_exp) + pos_exp)
         loss = torch.sum(-torch.log(softmax_score))
         return loss
 
