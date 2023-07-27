@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import warnings
 
 class KGDataset(object):
     def __init__(
@@ -43,8 +44,8 @@ class KGDataset(object):
                 t = entity_to_id[t]
                 r = relation_to_id[r]
                 ret.append([h, r, t])
-            except Exception:
-                ret.append([-1, -1, -1])
+            except KeyError:
+               warnings.warn(f"Unknown Key in triple ({h}, {r}, {t}).") 
 
         self._num_triples = np.array(ret, dtype=np.int32)
 
