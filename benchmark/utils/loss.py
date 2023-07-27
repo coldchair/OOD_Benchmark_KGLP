@@ -54,7 +54,24 @@ class NLL(Loss):
         return loss
 
         
+class BCEWithLogitsLoss(Loss):
+    def forward(
+        self,
+        pos_ret: FloatTensor, # (batch_size,)
+        neg_ret: FloatTensor, # (batch_size, eta)
+    ):
+        pos_p = torch.nn.functional.sigmoid(pos_ret).view(-1)
+        neg_p = torch.nn.functional.sigmoid(neg_ret).view(-1)
+        n = pos_p.size(0) + neg_p.size(0)
+
+        loss = - (torch.log(pos_p).sum() + torch.log(1-neg_p).sum()) / n
+
+        return loss
+
+
+
 LOSS = {
     "multiclass_nll": MulticlassNLL,
-    "nll": NLL
+    "nll": NLL,
+    "BCEWithLogits": BCEWithLogitsLoss
 }
