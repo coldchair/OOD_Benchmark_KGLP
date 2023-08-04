@@ -1,0 +1,27 @@
+seed: 233
+
+model:
+  name: RotatE
+  embedding_dim: 400
+  regularizer: LpRegularizer
+  regularizer_kwargs:
+    p: 2.0
+    weight: 1.0e-4
+
+train:
+  batch_count: 5
+  lr: 1.0e-4
+  loss: NSSA
+  loss_kwargs:
+    margin: 9.0
+    adversarial_temperature: 1.0
+    reduction: mean
+
+  eta: 30
+  mode: ht
+  epochs: 4000
+
+eval:
+  batch_size: 64
+  ranking_strategy: worst
+

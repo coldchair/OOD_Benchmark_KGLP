@@ -1,0 +1,22 @@
+seed: 233
+
+model:
+  name: TransE
+  embedding_dim: 400
+  scoring_fct_norm: 1
+  regularizer: LpRegularizer
+  regularizer_kwargs:
+    p: 2.0
+    weight: 1.0e-4
+
+train:
+  batch_count: 150
+  lr: 1.0e-4
+  loss: multiclass_nll
+  eta: 30
+  epochs: 4000
+
+eval:
+  batch_size: 64
+  ranking_strategy: worst
+

@@ -1,0 +1,27 @@
+seed: 233
+
+model:
+  name: ConvE
+  embedding_dim: 200
+  input_channels: 1
+  output_channels: 32
+  embedding_height: 10
+  embedding_width: 20
+  kernel_height: 3
+  kernel_width: 3
+  input_dropout: 0.2
+  feature_map_dropout: 0.2
+  output_dropout: 0.3
+
+train:
+  batch_count: 1000
+  lr: 1.0e-4
+  loss: multiclass_nll
+  eta: 30
+  epochs: 4000
+
+eval:
+  batch_size: 64
+  ranking_strategy: worst
+  
+

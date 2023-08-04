@@ -1,0 +1,23 @@
+seed: 233
+
+model:
+  name: TuckER
+  embedding_dim: 200
+  relation_dim: 200
+  dropout_0: 0.3
+  dropout_1: 0.4
+  dropout_2: 0.5
+  apply_batch_normalization: true
+
+train:
+  batch_size: 128
+  lr: 5.0e-4
+  loss: BCEWithLogits
+  eta: 30
+  epochs: 3
+
+eval:
+  batch_size: 256
+  ranking_strategy: worst
+
+
