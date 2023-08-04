@@ -54,7 +54,7 @@ class NLL(Loss):
         return loss
 
         
-class BCEWithLogitsLoss(Loss):
+class BCEWithLogits(Loss):
     def forward(
         self,
         pos_ret: FloatTensor, # (batch_size,)
@@ -68,10 +68,24 @@ class BCEWithLogitsLoss(Loss):
 
         return loss
 
+class NSSA(Loss):
+    def __init__(self, margin, adversarial_temperature, reduction="mean"):
+        from pykeen.losses import NSSALoss
+        self.loss_func = NSSALoss(margin, adversarial_temperature, reduction)
+
+    def forward(
+        self, 
+        pos_ret: FloatTensor, 
+        neg_ret: FloatTensor, 
+    ):
+
+        return self.loss_func.process_slcwa_scores(pos_ret, neg_ret)
+        
 
 
 LOSS = {
     "multiclass_nll": MulticlassNLL,
     "nll": NLL,
-    "BCEWithLogits": BCEWithLogitsLoss
+    "BCEWithLogits": BCEWithLogits,
+    "NSSA": NSSA
 }
