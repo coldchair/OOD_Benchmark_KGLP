@@ -22,9 +22,9 @@ def train(
     
     batch_size = config.train.get("batch_size", None)
     batch_count = config.train.get("batch_count", None)
-    dataloader = KGDataloader(train_dataset, eta, batch_size, batch_count)
+    dataloader = KGDataloader(train_dataset, eta, batch_size, batch_count, mode = config.train.get("mode", "ht"))
 
-    loss_func = LOSS[config.train.loss](**config.train.get("loss_params", {}))
+    loss_func = LOSS[config.train.loss](**config.train.get("loss_kwargs", {}))
     print = tqdm.tqdm.write
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -105,4 +105,5 @@ def train(
     sd = model.state_dict()               
     sd_path = os.path.join(save_dir, "model.bin")
     torch.save(sd, sd_path)
+    print(f"Model Weights Saved at {sd_path}")
     return model

@@ -9,7 +9,8 @@ class KGDataloader(object):
         eta: int, 
         batch_size: int = None, 
         batch_count: int = None,
-        shuffle: bool = True
+        shuffle: bool = True,
+        mode: str = "ht",
     ):
         if (batch_size is None and batch_count is None) or (batch_size is not None and batch_count is not None):
             raise ValueError("batch_size and batch_count should be given just one of them.")
@@ -19,6 +20,7 @@ class KGDataloader(object):
         self.eta = eta
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.mode = mode
 
     def __len__(self):
         return len(self.dataset) // self.batch_size
@@ -27,16 +29,30 @@ class KGDataloader(object):
         if self.eta == 0:
             return None
 
+        mode = self.mode
+
         eta = self.eta
         dataset = torch.reshape(
             torch.tile(torch.reshape(batch, [-1]), [eta]),
             [batch.shape[0] * eta, 3]
         )
-        keep_head_mask = torch.randint(
-            0, 2, [dataset.shape[0]], dtype=torch.int32
-        ).bool()
-        
-        keep_tail_mask = ~keep_head_mask
+        if mode == "ht": 
+            keep_head_mask = torch.randint(
+                0, 2, [dataset.shape[0]], dtype=torch.bool
+            )
+            
+            keep_tail_mask = ~keep_head_mask
+
+        elif mode == "h":
+            keep_head_mask = torch.zeros((dataset.shape[0],), dtype=torch.bool)
+            keep_tail_mask = ~keep_head_mask
+
+        elif mode == "t":
+            keep_head_mask = torch.ones((dataset.shape[0],), dtype=torch.bool)
+            keep_tail_mask = ~keep_head_mask
+
+        else:
+            raise ValueError(f"mode {mode} negative sampling does not support.")
 
         keep_head_mask = keep_head_mask.int()
         keep_tail_mask = keep_tail_mask.int()
