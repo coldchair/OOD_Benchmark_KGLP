@@ -7,6 +7,8 @@ from pykeen.models import (
     ConvE,
     DistMult,
     TransE,
+    RotatE,
+    TuckER,
 )
 
 from dataset import KGDataset
@@ -15,7 +17,9 @@ from utils import train, eval, RankingStrategy
 MODEL = {
     "TransE": TransE,
     "ConvE": ConvE,
-    "DistMult": DistMult
+    "DistMult": DistMult,
+    "RotatE": RotatE,
+    "TuckER": TuckER
 }
 
 def load_data(dir_path: str):
