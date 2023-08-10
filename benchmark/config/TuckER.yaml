@@ -13,12 +13,15 @@ train:
   batch_size: 128
   lr: 5.0e-4
   loss: BCEWithLogits
+  loss_kwargs:
+    label_smoothing: 0.1
   forward_type: tail
+  eval_step: 2125
   eta: 0
-  epochs: 3
+  epochs: 5
 
 eval:
-  batch_size: 256
+  batch_size: 1000
   ranking_strategy: worst
-
+  mode: t
 
