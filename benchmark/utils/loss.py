@@ -62,11 +62,18 @@ class NLL(Loss):
 
         
 class BCEWithLogits(Loss):
+    def __init__(self, label_smoothing: float = 0.0, **kwargs):
+        super().__init__(kwargs)
+        self.label_smoothing = label_smoothing
+
     def forward(
         self,
         pos_ret: FloatTensor, # (batch_size,)
         neg_ret: FloatTensor, # (batch_size, eta)
     ):
+        if self.label_smoothing > 0.0:
+            raise NotImplementedError
+
         pos_p = torch.nn.functional.sigmoid(pos_ret).view(-1)
         neg_p = torch.nn.functional.sigmoid(neg_ret).view(-1)
         n = pos_p.size(0) + neg_p.size(0)
@@ -80,18 +87,14 @@ class BCEWithLogits(Loss):
         ret: FloatTensor, # (batch_size, num_ent)
         target: IntTensor, # (batch_size,)
     ):
-        ret = torch.nn.functional.sigmoid(ret) 
-        n = ret.view(-1).size(0)
-
         target = target.long()
-        log_ret = torch.log(ret)
-        pos_sum = log_ret[torch.arange(ret.size(0), device=target.device, dtype=target.dtype), target].sum() 
-        log_ret_1 = torch.log(1-ret)
-        pos_sum_1 = log_ret_1[torch.arange(ret.size(0), device=target.device, dtype=target.dtype), target].sum() 
-        total_sum_1 = log_ret_1.sum()
-        neg_sum_1 = total_sum_1 - pos_sum_1
+        _target = torch.zeros_like(ret)
+        _target[torch.arange(ret.size(0), device=target.device, dtype=target.dtype), target] = 1.0
 
-        loss = - (pos_sum + neg_sum_1) / n
+        if self.label_smoothing > 0.0:
+            _target = ((1.0 - self.label_smoothing) * _target) + (1.0 / _target.size(1))
+
+        loss = torch.nn.functional.binary_cross_entropy_with_logits(ret, _target)
 
         return loss
 
