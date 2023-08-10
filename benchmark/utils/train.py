@@ -7,7 +7,7 @@ import tqdm
 
 from dataset import KGDataloader
 from .loss import LOSS
-from .eval import eval
+from .eval import eval, RankingStrategy
 
 def _head_forward(model, batch, loss_func, device):
     data = batch["positives"].to(device)
@@ -114,7 +114,9 @@ def train(
                     train_dataset,
                     valid_dataset,
                     batch_size = config.eval.batch_size,
-                    filter_datasets = (train_dataset, valid_dataset)
+                    filter_datasets = (train_dataset, valid_dataset),
+                    ranking_strategy = RankingStrategy[config.eval.get("ranking_strategy", "worst").upper()],
+                    mode = config.eval.get("mode", "ht").lower()
                 )
                 mrr = eval_ret["mrr"]
                 mr = eval_ret["mr"]
