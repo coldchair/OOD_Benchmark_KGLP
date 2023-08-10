@@ -81,7 +81,8 @@ def main(config):
         datasets["test"],
         batch_size=config.eval.batch_size,
         ranking_strategy=RankingStrategy[config.eval.get("ranking_strategy", "worst").upper()],
-        filter_datasets=tuple(datasets.values())
+        filter_datasets=tuple(datasets.values()),
+        mode = config.eval.get("mode", "ht").lower()
     )
     print("Result | mr: {:.2f} | mrr: {:.2f} | hits_1: {:.2f} | hits_3: {:.2f} | hits_10: {:.2f}".format(
         ret["mr"],
