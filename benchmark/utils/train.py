@@ -9,6 +9,40 @@ from dataset import KGDataloader
 from .loss import LOSS
 from .eval import eval
 
+def _head_forward(model, batch, loss_func, device):
+    data = batch["positives"].to(device)
+    ret = model.score_h(data[:, 1:])
+    loss = loss_func.target_foward(ret, data[:, 0])
+    return loss
+
+def _tail_forward(model, batch, loss_func, device):
+    data = batch["positives"].to(device)
+    ret = model.score_t(data[:, :2])
+    loss = loss_func.target_forward(ret, data[:, 2])
+    return loss
+
+def _normal_forward(model, batch, loss_func, device):
+    pos = batch["positives"].to(device)
+    neg = batch["negatives"].to(device)
+
+    pos_ret = model(pos[:, 0], pos[:, 1], pos[:, 2], mode=None).view(-1).contiguous()
+
+    _neg = neg.view(-1, 3).contiguous()
+    neg_ret = model(
+        _neg[:, 0], _neg[:, 1], _neg[:, 2], mode=None
+    ).view(neg.shape[:2]).contiguous()
+
+    loss = loss_func(pos_ret, neg_ret) + model.collect_regularization_term()
+
+    return loss
+
+FORWARD = {
+    "head": _head_forward, 
+    "tail": _tail_forward,
+    "normal": _normal_forward
+}
+
+
 def train(
     model: ERModel,
     config,
@@ -23,9 +57,13 @@ def train(
     batch_size = config.train.get("batch_size", None)
     batch_count = config.train.get("batch_count", None)
     dataloader = KGDataloader(train_dataset, eta, batch_size, batch_count, mode = config.train.get("mode", "ht"))
-
+    
     loss_func = LOSS[config.train.loss](**config.train.get("loss_kwargs", {}))
     print = tqdm.tqdm.write
+
+    forward_type = config.train.get("forward_type", "normal")
+    print(f"Forward Type: {forward_type}")
+    _forward = FORWARD[forward_type]
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Train on {device}")
@@ -53,17 +91,7 @@ def train(
             if step < start_step:
                 continue
 
-            pos = batch["positives"].to(device)
-            neg = batch["negatives"].to(device)
-
-            pos_ret = model(pos[:, 0], pos[:, 1], pos[:, 2], mode=None).view(-1).contiguous()
-
-            _neg = neg.view(-1, 3).contiguous()
-            neg_ret = model(
-                _neg[:, 0], _neg[:, 1], _neg[:, 2], mode=None
-            ).view(neg.shape[:2]).contiguous()
-
-            loss = loss_func(pos_ret, neg_ret) + model.collect_regularization_term()
+            loss = _forward(model, batch, loss_func, device)
             loss.backward()
             print(f"Epoch: {epoch} Step: {step}/{total_step} Loss: {loss.item()}")
             optimizer.step()

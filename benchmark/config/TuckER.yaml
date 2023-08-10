@@ -13,7 +13,8 @@ train:
   batch_size: 128
   lr: 5.0e-4
   loss: BCEWithLogits
-  eta: 30
+  forward_type: tail
+  eta: 0
   epochs: 3
 
 eval:

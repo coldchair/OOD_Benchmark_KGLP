@@ -1,5 +1,5 @@
 import torch
-from torch import FloatTensor
+from torch import FloatTensor, IntTensor
 
 class Loss(object):
     def __init__(self, *args, **kwargs):
@@ -24,6 +24,13 @@ class Loss(object):
         self,
         pos_ret: FloatTensor, 
         neg_ret: FloatTensor
+    ):
+        raise NotImplementedError
+
+    def target_forward(
+        self,
+        ret: FloatTensor,
+        target: IntTensor,
     ):
         raise NotImplementedError
 
@@ -65,6 +72,26 @@ class BCEWithLogits(Loss):
         n = pos_p.size(0) + neg_p.size(0)
 
         loss = - (torch.log(pos_p).sum() + torch.log(1-neg_p).sum()) / n
+
+        return loss
+
+    def target_forward(
+        self,
+        ret: FloatTensor, # (batch_size, num_ent)
+        target: IntTensor, # (batch_size,)
+    ):
+        ret = torch.nn.functional.sigmoid(ret) 
+        n = ret.view(-1).size(0)
+
+        target = target.long()
+        log_ret = torch.log(ret)
+        pos_sum = log_ret[torch.arange(ret.size(0), device=target.device, dtype=target.dtype), target].sum() 
+        log_ret_1 = torch.log(1-ret)
+        pos_sum_1 = log_ret_1[torch.arange(ret.size(0), device=target.device, dtype=target.dtype), target].sum() 
+        total_sum_1 = log_ret_1.sum()
+        neg_sum_1 = total_sum_1 - pos_sum_1
+
+        loss = - (pos_sum + neg_sum_1) / n
 
         return loss
 
