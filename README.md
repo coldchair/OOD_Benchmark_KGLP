@@ -1,5 +1,14 @@
 # OOD_Benchmark_KGLP
 
+### 9.10 更新
+
+模型请从清华云上扒下来：https://cloud.tsinghua.edu.cn/group/47256/
+
+MEIM 的环境见 https://github.com/tranhungnghiep/MEIM-KGE，也可以到 realcenter KG-new 上的 shared_disk 上找。
+
+目前脚本不支持 MEIM 直接运行（主要没环境），想单独运行，可以直接运行 sh bash.sh 。
+
+
 ### 如何使用：
 
 ```
