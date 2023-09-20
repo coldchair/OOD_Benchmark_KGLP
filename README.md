@@ -1,5 +1,35 @@
 # OOD_Benchmark_KGLP
 
+### 9.20更新
+
+MEIM-KGE 的 ranks 文件已更新。
+
+Anyburl 和 TuckER 添加。
+
+
+
+简单讲一下：MEIM-KGE 的 rank 是怎么得到的：
+
+假设预测 h, r, t 中的 t
+
+raw：对所有 train 和 test 中出现过的 entity，都得到评分，求 t 在其中的排名。
+
+filter：依旧是对所有 entity 求评分，但是 只考虑在 $\{x | x\in(h,r,x) \in Train ∪ Test\}$ 中的 t 的排名。
+
+不难发现，filter 的结果，受 test 中其它边影响小，因为大部分边在 train 中，而 train不变。
+
+反向边同理。
+
+排名策略（min)：同分时取排名最小
+
+排名策略（max）：同分时取排名最大
+
+排名策略（mean)：求 min 和 max 的平均值。
+
+MEIM 采用 mean 策略。
+
+
+
 ### 9.10 更新
 
 模型请从清华云上扒下来：https://cloud.tsinghua.edu.cn/group/47256/
